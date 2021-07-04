@@ -7,7 +7,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.item_news.view.*
 
 class NewsListAdapter(private val listener: NewsItemClicked) :
     RecyclerView.Adapter<NewsViewHolder>() {

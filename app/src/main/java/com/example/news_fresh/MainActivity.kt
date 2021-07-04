@@ -6,37 +6,39 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.news_fresh.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), NewsItemClicked {
 
     private lateinit var mAdapter: NewsListAdapter
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
         fetchData()
         mAdapter = NewsListAdapter(this)
-        recyclerView.adapter = mAdapter
+        binding.recyclerView.adapter = mAdapter
     }
 
     private fun fetchData() {
 
-        //val newsUrl = "https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=5cd8435ddad64a248fc99096aa387ab4"
+        // this url is not working
+        // val newsUrl = "https://newsapi.org/v2/top-headlines?country=in&apiKey=de760802658848c1a3367682a282f51b"
 
-        val newsUrl = "https://api.mediastack.com/v1/news?access_key=7babedcefa182208673dfc2a0a48178f&keywords=tennis&countries=in"
-
-        val retryPolicy = DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+        // this url is  working
+        val newsUrl = "https://saurav.tech/NewsAPI/top-headlines/category/technology/in.json"
 
         // Request a json response from the provided URL.
-        val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, newsUrl, null,
+        val jsonObjectRequest = JsonObjectRequest(
+            Request.Method.GET, newsUrl, null,
             {
-                val newsJsonArray = it.getJSONArray("data")
+                val newsJsonArray = it.getJSONArray("articles")
                 val newsArray = ArrayList<News>()
                 for (i in 0 until newsJsonArray.length()) {
                     val newsJsonObject = newsJsonArray.getJSONObject(i)
@@ -44,7 +46,7 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
                         newsJsonObject.getString("title"),
                         newsJsonObject.getString("author"),
                         newsJsonObject.getString("url"),
-                        newsJsonObject.getString("image")
+                        newsJsonObject.getString("urlToImage")
                     )
                     newsArray.add(news)
                 }
@@ -55,8 +57,6 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
                 //Toast.makeText(this, "Something went wrong $x", Toast.LENGTH_SHORT).show()
                 Toast.makeText(this, "Error code: $x", Toast.LENGTH_SHORT).show()
             })
-
-        jsonObjectRequest.retryPolicy = retryPolicy
 
         // Add the request to the RequestQueue.
         MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
